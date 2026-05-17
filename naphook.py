@@ -59,7 +59,7 @@ def main():
     
     try:
         print("🔄 Đang nạp lịch sử giao dịch vào RAM để tiết kiệm Read...")
-        time_limit = int(time.time() * 1000) - (2 * 3600 * 1000) # 2 tiếng trước
+        time_limit = int(time.time() * 1000) - (15300 * 1000) # 2 tiếng trước
         recent_txs = db_fs.collection('transactions').where('createdAt', '>=', time_limit).stream()
         for doc in recent_txs:
             processed_txs.add(doc.id)
@@ -70,7 +70,7 @@ def main():
     print("🚀 BOT BẮT ĐẦU HOẠT ĐỘNG (Quét 5s/lần)...\n")
     
     start_time = time.time()
-    MAX_RUN_TIME = 5.5 * 3600 
+    MAX_RUN_TIME = 4.25 * 3600 
 
     while True:
         if time.time() - start_time > MAX_RUN_TIME:
@@ -173,7 +173,7 @@ def main():
                 tx_hash = event['event_id'] 
 
                 # 🛡️ KHIÊN 1: Chặn đơn cổ đại (vượt quá 1 tiếng trước) để bot không bới móc quá khứ
-                if event['timestamp'] < (current_time - 3600):
+                if event['timestamp'] < (current_time - 15300):
                     continue
 
                 # 🛡️ KHIÊN 2: Bỏ qua đơn lơ lửng Mempool (Chờ xác nhận xong mới đớp)
