@@ -39,4 +39,4 @@ jobs:
           DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         # Tên file python của bạn (ví dụ: bot_nap.py)
-        run: python naphook.py
+        run: python -u naphook.py
