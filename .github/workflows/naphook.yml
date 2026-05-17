@@ -1,0 +1,42 @@
+name: Auto Deposit Scanner Worker
+
+# CHỈ KÍCH HOẠT KHI CÓ LỆNH GỌI TỪ BÊN NGOÀI
+on:
+  workflow_dispatch: # Cho phép bấm nút chạy bằng tay trên web Github
+  repository_dispatch:
+    types: [trigger-scanner] # Tên sự kiện để Webhook bên ngoài gọi vào
+
+# 🛡️ BẢO VỆ CHỐNG TRÙNG LẶP TIẾN TRÌNH
+concurrency:
+  group: deposit-scanner
+  cancel-in-progress: true # Tự tắt luồng cũ nếu luồng mới được gọi dậy
+
+jobs:
+  run-scanner:
+    runs-on: ubuntu-latest
+    
+    # ⏱️ THỜI GIAN SỐNG: Cài 350 phút (Gần 6 tiếng - giới hạn tối đa của Github)
+    timeout-minutes: 260
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 📦 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests firebase-admin
+
+      - name: 🚀 Run Scanner Bot
+        env:
+          # Bơm biến môi trường từ Github Secrets
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        # Tên file python của bạn (ví dụ: bot_nap.py)
+        run: python naphook.py
